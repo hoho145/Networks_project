@@ -6,6 +6,15 @@ serverPort = 12000
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.connect((serverIP, serverPort))
 
+# Send login info
+username = input("Enter username: ")
+password = input("Enter password: ")
+clientSocket.send(pickle.dumps((username, password)))
+
+# Receive login response
+response = pickle.loads(clientSocket.recv(1024))
+print(response)
+
 # Receive quiz
 serialized_quiz = clientSocket.recv(4096)
 quiz = pickle.loads(serialized_quiz)
@@ -25,5 +34,8 @@ clientSocket.send(pickle.dumps(answers))
 # Receive result
 result = pickle.loads(clientSocket.recv(4096))
 print(result)
+# Receive scoreboard
+scoreboard = pickle.loads(clientSocket.recv(4096))
+print(scoreboard)
 
 clientSocket.close()
