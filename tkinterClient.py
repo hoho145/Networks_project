@@ -7,7 +7,7 @@ class QuizClient:
     def __init__(self, root):
         self.root = root
         self.root.title("Online Quiz System")
-        self.root.geometry("600x400")
+        self.root.geometry("800x600")
         self.root.resizable(False, False)
 
         self.client_socket = socket(AF_INET, SOCK_STREAM)
@@ -22,17 +22,19 @@ class QuizClient:
     def create_login_screen(self):
         self.clear_window()
 
-        tk.Label(self.root, text="Online Quiz System", font=("Arial", 16, "bold")).pack(pady=20)
+        # Create a frame to hold login widgets, centered in the window
+        frame = tk.Frame(self.root, bg="#323132", relief="groove", borderwidth=2)
+        frame.place(relx=0.5, rely=0.5, anchor="center")  # Center frame in window
 
-        tk.Label(self.root, text="Username:", font=("Arial", 12)).pack()
-        self.username_entry = tk.Entry(self.root, font=("Arial", 12))
+        # Login widgets in the frame using pack
+        tk.Label(frame, text="Online Quiz System", font=("Arial", 16, "bold"), bg="#323132").pack(pady=20)
+        tk.Label(frame, text="Username:", font=("Arial", 12), bg="#323132").pack()
+        self.username_entry = tk.Entry(frame, font=("Arial", 12))
         self.username_entry.pack(pady=5)
-
-        tk.Label(self.root, text="Password:", font=("Arial", 12)).pack()
-        self.password_entry = tk.Entry(self.root, show="*", font=("Arial", 12))
+        tk.Label(frame, text="Password:", font=("Arial", 12), bg="#323132").pack()
+        self.password_entry = tk.Entry(frame, show="*", font=("Arial", 12))
         self.password_entry.pack(pady=5)
-
-        tk.Button(self.root, text="Login", font=("Arial", 12), command=self.handle_login).pack(pady=20)
+        tk.Button(frame, text="Login", font=("Arial", 12), command=self.handle_login).pack(pady=20)
 
     def clear_window(self):
         for widget in self.root.winfo_children():
