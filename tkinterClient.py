@@ -23,12 +23,12 @@ class QuizClient:
         self.clear_window()
 
         # Create a frame to hold login widgets, centered in the window
-        frame = tk.Frame(self.root, bg="#323132", relief="groove", borderwidth=2)
+        frame = tk.Frame(self.root, bg="#323332", relief="groove", borderwidth=2)
         frame.place(relx=0.5, rely=0.5, anchor="center")  # Center frame in window
-
+        self.root.configure(bg="#323332")  # Set background color of the root window
         # Login widgets in the frame using pack
-        tk.Label(frame, text="Online Quiz System", font=("Arial", 16, "bold"), bg="#323132").pack(pady=20)
-        tk.Label(frame, text="Username:", font=("Arial", 12), bg="#323132").pack()
+        tk.Label(frame, text="Online Quiz System", font=("Arial", 16, "bold"), bg="#323332").pack(pady=20)
+        tk.Label(frame, text="Username:", font=("Arial", 12), bg="#323332").pack()
         self.username_entry = tk.Entry(frame, font=("Arial", 12))
         self.username_entry.pack(pady=5)
         tk.Label(frame, text="Password:", font=("Arial", 12), bg="#323132").pack()
