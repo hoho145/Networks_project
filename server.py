@@ -18,8 +18,27 @@ questions = [
     ["Which planet is closest to the Sun?", ["Earth", "Mars", "Mercury", "Venus"], 2],
     ["What is the capital of France?", ["Paris", "London", "Berlin", "Madrid"], 0],
     ["How many legs does a spider have?", ["6", "8", "10", "12"], 1],
-    ["What is 10-4?", ["4", "5", "6", "7"], 2]
-]
+    ["What is 10-4?", ["4", "5", "6", "7"], 2],
+    ["What is the largest mammal?", ["Elephant", "Giraffe", "Blue Whale", "Rhinoceros"], 2],
+    ["Which element has the symbol 'Fe'?", ["Gold", "Silver", "Copper", "Iron"], 3],
+    ["What is the square root of 16?", ["2", "3", "4", "5"], 2],
+    ["Who painted the Mona Lisa?", ["Van Gogh", "Da Vinci", "Picasso", "Rembrandt"], 1],
+    ["What is the capital of Japan?", ["Seoul", "Beijing", "Tokyo", "Bangkok"], 2],
+    ["How many continents are there?", ["5", "6", "7", "8"], 2],
+    ["What is 12 x 12?", ["122", "144", "156", "168"], 1],
+    ["Which gas do plants absorb?", ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], 1],
+    ["What is the largest planet in our solar system?", ["Mars", "Venus", "Saturn", "Jupiter"], 3],
+    ["What year did World War II end?", ["1943", "1944", "1945", "1946"], 2],
+    ["Which is the longest river in the world?", ["Amazon", "Nile", "Mississippi", "Yangtze"], 1],
+    ["What is the chemical symbol for gold?", ["Ag", "Au", "Fe", "Cu"], 1],
+    ["How many bones are in the human body?", ["186", "206", "226", "246"], 1],
+    ["What is the speed of light?", ["299,792 km/s", "199,792 km/s", "399,792 km/s", "499,792 km/s"], 0],
+    ["Which planet is known as the Red Planet?", ["Venus", "Mars", "Jupiter", "Saturn"], 1],
+    ["What is the capital of Australia?", ["Sydney", "Melbourne", "Canberra", "Perth"], 2],
+    ["Who wrote 'Romeo and Juliet'?", ["Charles Dickens", "William Shakespeare", "Jane Austen", "Mark Twain"], 1],
+    ["What is the chemical formula for table salt?", ["H2O", "CO2", "NaCl", "O2"], 2],
+    ["How many sides does a hexagon have?", ["5", "6", "7", "8"], 1],
+    ["What is the largest ocean?", ["Atlantic", "Indian", "Arctic", "Pacific"], 3]]
 
 def load_users():
     try:
@@ -63,7 +82,7 @@ def handle_client(connectionSocket, client_addr):
     print(f"New client connected: {client_addr}")
     try:
         users = load_users()
-        Data_user = connectionSocket.recv(4096)
+        Data_user = connectionSocket.recv(16384)
         user,passs = pickle.loads(Data_user)
 
         if user in users:
@@ -86,7 +105,7 @@ def handle_client(connectionSocket, client_addr):
         
         # Set 2-minute timeout for receiving answers
         connectionSocket.settimeout(120)
-        serialized_answers = connectionSocket.recv(4096)
+        serialized_answers = connectionSocket.recv(16384)
         answers = pickle.loads(serialized_answers)
         
         # Grade the quiz
