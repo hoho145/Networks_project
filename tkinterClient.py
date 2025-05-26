@@ -2,6 +2,9 @@ from socket import *
 import pickle
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
+import ttkthemes
+import time
 
 class QuizClient:
     def __init__(self, root):
@@ -10,32 +13,140 @@ class QuizClient:
         self.root.geometry("800x600")
         self.root.resizable(False, False)
 
+        # Apply modern theme
+        self.style = ttkthemes.ThemedStyle(self.root)
+        self.style.set_theme("arc")
+
+        # Add logo frame in top left corner
+        # self.logo_frame = ttk.Frame(self.root, width=100, height=100)
+        # self.logo_frame.place(x=10, y=10)
+        # # You can add your logo image here using:
+        # # self.logo_image = tk.PhotoImage(file="C:\Users\hanyo\Downloads\Networks_project-main\Networks_project-main\logo_imag.png")
+        # # logo_label = ttk.Label(self.logo_frame, image=self.logo_image)
+        # # logo_label.pack()
+
         self.client_socket = socket(AF_INET, SOCK_STREAM)
         self.server_ip = "127.0.0.1"
         self.server_port = 12000
         self.quiz = []
         self.answers = []
         self.current_question = 0
+        self.time_left = 300  # 5 minutes in seconds
 
         self.create_login_screen()
 
     def create_login_screen(self):
         self.clear_window()
 
-        # Create a frame to hold login widgets, centered in the window
-        frame = tk.Frame(self.root, bg="#323332", relief="groove", borderwidth=2)
-        frame.place(relx=0.5, rely=0.5, anchor="center")  # Center frame in window
-        self.root.configure(bg="#323332")  # Set background color of the root window
-        # Login widgets in the frame using pack
-        tk.Label(frame, text="Online Quiz System", font=("Arial", 16, "bold"), bg="#323332").pack(pady=20)
-        tk.Label(frame, text="Username:", font=("Arial", 12), bg="#323332").pack()
-        self.username_entry = tk.Entry(frame, font=("Arial", 12))
-        self.username_entry.pack(pady=5)
-        tk.Label(frame, text="Password:", font=("Arial", 12), bg="#323132").pack()
-        self.password_entry = tk.Entry(frame, show="*", font=("Arial", 12))
-        self.password_entry.pack(pady=5)
-        tk.Button(frame, text="Login", font=("Arial", 12), command=self.handle_login).pack(pady=20)
+        # Recreate logo frame after clearing window
+        # self.logo_frame = ttk.Frame(self.root, width=100, height=100)
+        # self.logo_frame.place(x=10, y=10)
+        # # Uncomment and modify these lines to add your logo
+        # # self.logo_image = tk.PhotoImage(file="C:\Users\hanyo\Downloads\Networks_project-main\Networks_project-main\logo_imag.png")
+        # # logo_label = ttk.Label(self.logo_frame, image=self.logo_image)
+        # # logo_label.pack()
 
+        # Create a modern container frame
+        container = ttk.Frame(self.root)
+        container.place(relx=0.5, rely=0.5, anchor="center")
+        
+        # Create a modern card-like frame
+        frame = ttk.Frame(container)
+        frame.pack(padx=30, pady=30)
+        
+        # Add shadow effect and rounded corners using canvas
+        canvas = tk.Canvas(frame, width=400, height=500, bg='white', highlightthickness=0)
+        canvas.pack()
+        
+        # Modern login content
+        title_label = ttk.Label(frame, text="Online Quiz System", font=("Helvetica", 24, "bold"))
+        title_label.place(relx=0.5, rely=0.1, anchor="center")
+
+        # Username container
+        username_container = ttk.Frame(frame)
+        username_container.place(relx=0.5, rely=0.3, anchor="center")
+        
+        username_label = ttk.Label(username_container, text="Username", font=("Helvetica", 12))
+        username_label.pack()
+        
+        self.username_entry = ttk.Entry(username_container, font=("Helvetica", 12), width=30)
+        self.username_entry.pack(pady=5)
+        self.username_entry.configure(style='Modern.TEntry')
+
+        # Password container
+        password_container = ttk.Frame(frame)
+        password_container.place(relx=0.5, rely=0.5, anchor="center")
+        
+        password_label = ttk.Label(password_container, text="Password", font=("Helvetica", 12))
+        password_label.pack()
+        
+        self.password_entry = ttk.Entry(password_container, show="•", font=("Helvetica", 12), width=30)
+        self.password_entry.pack(pady=5)
+        self.password_entry.configure(style='Modern.TEntry')
+
+        # Regular button (not modern styled)
+        login_button = tk.Button(frame, text="Login", command=self.handle_login,
+                               font=("Helvetica", 12), bg="#5275E6", fg="white",
+                               relief="raised", width=20, height=1)
+        login_button.place(relx=0.5, rely=0.7, anchor="center")
+
+    def show_quiz_screen(self):
+        self.clear_window()
+
+        # Recreate logo frame after clearing window
+        # self.logo_frame = ttk.Frame(self.root, width=100, height=100)
+        # self.logo_frame.place(x=10, y=10)
+        # # Uncomment and modify these lines to add your logo
+        # # self.logo_image = tk.PhotoImage(file="C:\Users\hanyo\Downloads\Networks_project-main\Networks_project-main\logo_imag.png")
+        # # logo_label = ttk.Label(self.logo_frame, image=self.logo_image)
+        # # logo_label.pack()
+
+        # Create main container
+        main_frame = ttk.Frame(self.root, style='Card.TFrame')
+        main_frame.pack(expand=True, fill='both', padx=20, pady=20)
+
+        # Add timer label
+        self.timer_label = ttk.Label(main_frame, text="Time left: 5:00", font=("Helvetica", 14))
+        self.timer_label.pack(pady=10)
+        self.update_timer()
+
+        if self.current_question < len(self.quiz):
+            question_data = self.quiz[self.current_question]
+            question_text = f"Question {self.current_question + 1} of {len(self.quiz)}"
+            
+            # Progress bar
+            progress = ttk.Progressbar(main_frame, length=300, mode='determinate')
+            progress['value'] = (self.current_question + 1) / len(self.quiz) * 100
+            progress.pack(pady=10)
+
+            ttk.Label(main_frame, text=question_text, font=("Helvetica", 14, "bold")).pack(pady=10)
+            ttk.Label(main_frame, text=question_data[0], font=("Helvetica", 12), wraplength=600).pack(pady=10)
+
+            self.selected_answer = tk.IntVar(value=-1)
+            for i, choice in enumerate(question_data[1]):
+                ttk.Radiobutton(main_frame, text=choice, variable=self.selected_answer, 
+                               value=i, style='TRadiobutton').pack(anchor="w", padx=40, pady=5)
+
+            button_text = "Next" if self.current_question < len(self.quiz) - 1 else "Submit"
+            ttk.Button(main_frame, text=button_text, command=self.next_question, 
+                      style='Accent.TButton').pack(pady=20)
+
+    def update_timer(self):
+        if hasattr(self, 'start_time') == False:
+            self.start_time = time.time()
+            self.time_left = 300  # 5 minutes in seconds
+            
+        elapsed_time = int(time.time() - self.start_time)
+        self.time_left = max(300 - elapsed_time, 0)
+        
+        if self.time_left > 0:
+            minutes = self.time_left // 60
+            seconds = self.time_left % 60
+            self.timer_label.config(text=f"Time left: {minutes}:{seconds:02d}")
+            self.root.after(1000, self.update_timer)
+        else:
+            messagebox.showwarning("Time's up!", "Your time has expired!")
+            self.submit_quiz()
     def clear_window(self):
         for widget in self.root.winfo_children():
             widget.destroy()
@@ -54,7 +165,6 @@ class QuizClient:
             response = pickle.loads(self.client_socket.recv(1024))
             messagebox.showinfo("Login", response)
 
-            # Receive quiz
             serialized_quiz = self.client_socket.recv(4096)
             self.quiz = pickle.loads(serialized_quiz)
             self.answers = [None] * len(self.quiz)
@@ -64,24 +174,6 @@ class QuizClient:
         except Exception as e:
             messagebox.showerror("Error", f"Connection failed: {e}")
             self.client_socket.close()
-
-    def show_quiz_screen(self):
-        self.clear_window()
-
-        if self.current_question < len(self.quiz):
-            question_data = self.quiz[self.current_question]
-            question_text = f"Q{self.current_question + 1}: {question_data[0]}"
-            tk.Label(self.root, text=question_text, font=("Arial", 14), wraplength=500).pack(pady=20)
-
-            self.selected_answer = tk.IntVar(value=-1)
-            for i, choice in enumerate(question_data[1]):
-                tk.Radiobutton(self.root, text=choice, font=("Arial", 12),
-                               variable=self.selected_answer, value=i).pack(anchor="w", padx=20)
-
-            tk.Button(self.root, text="Next" if self.current_question < len(self.quiz) - 1 else "Submit",
-                      font=("Arial", 12), command=self.next_question).pack(pady=20)
-        else:
-            self.submit_quiz()
 
     def next_question(self):
         if self.selected_answer.get() == -1:
@@ -102,11 +194,32 @@ class QuizClient:
             scoreboard = pickle.loads(self.client_socket.recv(4096))
 
             self.clear_window()
-            tk.Label(self.root, text="Quiz Results", font=("Arial", 16, "bold")).pack(pady=20)
-            tk.Label(self.root, text=result, font=("Arial", 12)).pack(pady=10)
-            tk.Label(self.root, text="Scoreboard:", font=("Arial", 12, "bold")).pack(pady=10)
-            tk.Label(self.root, text=scoreboard, font=("Arial", 12), wraplength=500).pack(pady=10)
-            tk.Button(self.root, text="Exit", font=("Arial", 12), command=self.exit).pack(pady=20)
+            
+            # Recreate logo frame after clearing window
+            # self.logo_frame = ttk.Frame(self.root, width=100, height=100)
+            # self.logo_frame.place(x=10, y=10)
+            # # Uncomment and modify these lines to add your logo
+            # # self.logo_image = tk.PhotoImage(file="path_to_your_logo.png")
+            # # logo_label = ttk.Label(self.logo_frame, image=self.logo_image)
+            # # logo_label.pack()
+            
+            # Create results container
+            results_frame = ttk.Frame(self.root, style='Card.TFrame')
+            results_frame.pack(expand=True, fill='both', padx=40, pady=40)
+
+            ttk.Label(results_frame, text="Quiz Results", font=("Helvetica", 24, "bold")).pack(pady=20)
+            ttk.Label(results_frame, text=result, font=("Helvetica", 14)).pack(pady=10)
+            ttk.Label(results_frame, text="Scoreboard", font=("Helvetica", 16, "bold")).pack(pady=10)
+            
+            # Create scrollable scoreboard
+            scoreboard_frame = ttk.Frame(results_frame)
+            scoreboard_frame.pack(fill='both', expand=True, pady=10)
+            
+            ttk.Label(scoreboard_frame, text=scoreboard, font=("Helvetica", 12), 
+                     wraplength=600).pack(pady=10)
+            
+            ttk.Button(results_frame, text="Exit", command=self.exit, 
+                      style='Accent.TButton').pack(pady=20)
 
         except Exception as e:
             messagebox.showerror("Error", f"Error submitting quiz: {e}")
